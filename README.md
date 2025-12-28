@@ -58,8 +58,55 @@ By default it prints a plan and does nothing unless you pass `--apply`.
 git clone https://github.com/Bhargav9490/static.git
 cd static 
 ```
---- 
-1) Download and make executable
+
+## 1) Download and make executable
 ```bash
 chmod +x setup.sh
+```
+
+## 2) Check your network interface name (important)
+```bash
+ip -o link show
+```
+
+## 3) Check your network interface name (important)
+```bash
+ip -o link show
+```
+
+## 4) Dry run (recommended) 
+Shows what will change, but does not modify anything.
+```bash
+sudo ./setup.sh \
+  --if enp0s3 \
+  --ip 10.0.9.215 \
+  --nm 255.0.0.0 \
+  --gw 10.0.0.254 \
+  --dns "8.8.8.8,1.1.1.1" \
+  --dry-run
+```
+
+## 5) Apply (real execution)
+Shows what will change, but does not modify anything.
+```bash
+sudo ./setup.sh \
+  --if enp0s3 \
+  --ip 10.0.9.215 \
+  --nm 255.0.0.0 \
+  --gw 10.0.0.254 \
+  --dns "8.8.8.8,1.1.1.1" \
+  --apply
+```
+
+## 6) Verify
+```bash
+ip -4 addr show dev enp0s3
+```
+
+```bash
+ip route
+```
+
+```bash
+cat /etc/network/interfaces
 ```
