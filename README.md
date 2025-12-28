@@ -1,4 +1,4 @@
-![Static IP Setup Preview](Image.webp)
+<img src="Image.webp" alt="Static IP Setup Preview" width="900">
 
 # setup.sh — Static IPv4 in seconds (Ubuntu 16.04 → 24.04)
 
