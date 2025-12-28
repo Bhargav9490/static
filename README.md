@@ -54,6 +54,11 @@ By default it prints a plan and does nothing unless you pass `--apply`.
 
 ## How to run
 
+## 0) Clone the repo
+```bash
+git clone https://github.com/Bhargav9490/static.git
+cd static
+
 ### 1) Download and make executable
 ```bash
 chmod +x setup.sh
