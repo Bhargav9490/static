@@ -87,7 +87,7 @@ sudo ./setup.sh \
 ```
 
 ## 5) Apply (real execution)
-Shows what will change, but does not modify anything.
+IP address, Subnet and Gateway can be changed as per your infrastructure 
 ```bash
 sudo ./setup.sh \
   --if enp0s3 \
