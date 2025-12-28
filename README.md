@@ -1,70 +1,59 @@
-# setup.sh — Switch Ubuntu to classic `ifupdown` and set a static IPv4
+# setup.sh — Static IPv4 in seconds (Ubuntu 16.04 → 24.04)
 
-This script converts an Ubuntu machine (tested Ubuntu **16.04 → 24.04**) from modern networking (Netplan / NetworkManager / cloud-init networking) to classic **ifupdown** and configures a **static IPv4** address on a selected network interface.
+When you deploy VMs/instances into certain environments (SOC labs, OT/ICS networks, private VLANs, isolated training setups, customer networks, etc.), **DHCP may be disabled or unreliable**, and **only static IP addressing works**.
 
-✅ Safe by default: it prints a full plan first and **does nothing unless you pass `--apply`**.
+Manually configuring static IP on Ubuntu can be slow and error-prone because modern Ubuntu may involve:
+- Netplan YAML files
+- cloud-init rewriting networking at boot
+- NetworkManager/systemd-networkd conflicting with changes
 
----
-
-## What this script does
-
-### 1) Reads inputs (with defaults)
-Default configuration:
-- Interface: `enp0s3`
-- IP: `10.0.9.215`
-- Netmask: `255.0.0.0`
-- Gateway: `10.0.0.254`
-- DNS: `8.8.8.8, 1.1.1.1`
-
-You can override these using CLI flags.
+This script automates the full conversion and configuration in **seconds**, making it a “game changer” for scenarios where you need to **quickly assign a correct static IP** to a VM/instance without spending time debugging network stack conflicts.
 
 ---
 
-### 2) Validates basic settings
-- Ensures you run as `root` (`sudo`)
-- Checks if the given interface exists:
-  - If interface is missing and you try `--apply`, it **refuses to proceed**
-- Warns if netmask is `255.0.0.0` (that is a `/8`)
+## Problem Statement
+
+In static-only networks, a VM/instance must be configured with a static IP immediately to be reachable.  
+Doing this manually is painful because:
+- Different Ubuntu versions use different systems (Netplan vs ifupdown).
+- cloud-init may revert your manual configuration on reboot.
+- Multiple network managers can fight each other (NetworkManager, systemd-networkd, wait-online).
+- In fast deployments (cloning many VMs, templates, lab rollouts), you need a repeatable method to set static IP **consistently and quickly**.
+
+✅ **Goal:** Configure static IPv4 in seconds, consistently, and prevent other services from undoing it.
 
 ---
 
-### 3) Prints a plan (before applying)
-The script prints:
-- selected interface + IP config
-- which managers/services will be disabled
-- the exact `/etc/network/interfaces` content it will write
+## What this script does (How it works)
 
-If you run with `--dry-run`, it exits after printing the plan.
+When executed with `--apply`, the script:
+1. **Backs up** existing configs into `/root/static-net-backup/`
+2. **Disables conflicting services** (NetworkManager, systemd-networkd, wait-online) if they exist
+3. **Disables cloud-init networking** (prevents it from overwriting your settings)
+4. **Removes Netplan YAMLs** (`/etc/netplan/*.yaml`)
+5. **Installs classic `ifupdown`**
+6. **Writes `/etc/network/interfaces`** with your static IP, gateway, and DNS
+7. **Applies networking immediately** (flushes IP, ifdown/ifup)
+8. **Enables persistence** so the config survives reboot
 
----
-
-## What happens when you run with `--apply`
-
-### 4) Creates safety backups
-Backups are stored in:
-- `/root/static-net-backup`
-
-It saves (if present), with timestamps:
-- `/etc/network/interfaces`
-- `/etc/netplan/`
-- `/etc/cloud/cloud.cfg.d/`
+By default it prints a plan and does nothing unless you pass `--apply`.
 
 ---
 
-### 5) Disables network services that can conflict
-Disables/masks (if they exist):
-- `systemd-networkd-wait-online`
-- `systemd-networkd`
-- `NetworkManager`
-
-This prevents multiple network managers from fighting over configuration.
+## Requirements
+- Ubuntu 16.04 to 24.04
+- Must run with `sudo` / root
+- Know your correct:
+  - interface name (ex: `enp0s3`, `ens18`)
+  - static IP
+  - netmask
+  - gateway
+  - DNS
 
 ---
 
-### 6) Disables cloud-init networking
-Creates/overwrites:
-- `/etc/cloud/cloud.cfg.d/99-disable-network-config.cfg`
+## How to run
 
-Content:
-```yaml
-network: {config: disabled}
+### 1) Download and make executable
+```bash
+chmod +x setup.sh
