@@ -1,6 +1,6 @@
 # setup.sh — Static IPv4 in seconds (Ubuntu 16.04 → 24.04)
 
-When you deploy VMs/instances into certain environments (SOC labs, OT/ICS networks, private VLANs, isolated training setups, customer networks, etc.), **DHCP may be disabled or unreliable**, and **only static IP addressing works**.
+When you deploy VMs/instances into certain environments (Isolated Setup, SOC UAT/Labs, IOT/OT networks, private VLANs, customer networks, etc.), **DHCP may be disabled or unreliable**, and **only static IP addressing works**.
 
 Manually configuring static IP on Ubuntu can be slow and error-prone because modern Ubuntu may involve:
 - Netplan YAML files
